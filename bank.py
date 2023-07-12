@@ -25,8 +25,9 @@ class Bank:
         else:
             print("Incorrect account number.")
 
-emily = Bank("Emily Wang", 1)
-emily.balance(1)
-emily.dep(30)
-emily.balance(1)
-emily.wd(20)
+if __name__ == "__main__":
+    emily = Bank("Emily Wang", 1, 0)
+    emily.balance(1)
+    emily.dep(1, 30)
+    emily.balance(1)
+    emily.wd(1, 20)

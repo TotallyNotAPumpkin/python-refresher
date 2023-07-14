@@ -128,7 +128,7 @@ def calculate_auv_acceleration(force_magnitude, force_angle, mass=100, volume=0.
     ax = force_magnitude * math.cos(force_angle) / mass
     net_acceleration = math.sqrt(ay**2 + ax**2)
     return net_acceleration
-print(calculate_auv_acceleration(10, math.pi / 12, 100, 0.1, 0.5))
+
 def calculate_auv_angular_acceleration(force_magnitude, force_angle, inertia=1, thruster_distance=0.5):
     """Calculates angular acceleration of AUV in a 2D plane.
     Args:

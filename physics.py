@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 g = 9.81 # m/s^2
 atm_pressure = 101325 # Pa
@@ -45,94 +46,160 @@ def calculate_pressure(depth):
     pressure = water_density * g * depth + atm_pressure
     return pressure # Pa
 
-def calculate_acceleration(F, m):
+def calculate_acceleration(force, mass):
     """Calculates and returns acceleration of an object.
-    args:
-        F (float): force applied to object in Newtons
-        m (float): mass of object in kG
-    returns:
-        acc = acceleration of object with a force (F) applied and mass (m)
+    Args:
+        force (float): Force applied to object in Newtons.
+        mass (float): Mass of object in kg.
+    Returns:
+        float: Acceleration of object with the given force and mass.
     """
-    if F <= 0 or m <= 0:
+    if not all(isinstance(val, (int, float)) for val in (force, mass)):
         raise ValueError("Invalid input value(s).")
-    acc = F / m
-    return acc # m/s^2
+    if force <= 0 or mass <= 0:
+        raise ValueError("Invalid input value(s).")
+    acceleration = force / mass
+    return acceleration  # m/s^2
 
-def calculate_angular_acceleration(tau, I):
+def calculate_angular_acceleration(torque, moment_of_inertia):
     """Calculates angular acceleration of an object.
-    args:
-        tau (float): torque applied to object in Nm
-        I (float): moment of inertia of object in kg * m^2
+    Args:
+        torque (float): Torque applied to object in Nm.
+        moment_of_inertia (float): Moment of inertia of object in kg * m^2.
+    Returns:
+        float: Angular acceleration of the object.
     """
-    if tau <= 0 or I <= 0:
+    if not all(isinstance(val, (int, float)) for val in (torque, moment_of_inertia)):
         raise ValueError("Invalid input value(s).")
-    alpha = tau / I
-    return alpha 
+    if torque <= 0 or moment_of_inertia <= 0:
+        raise ValueError("Invalid input value(s).")
+    angular_acceleration = torque / moment_of_inertia
+    return angular_acceleration
 
-def calculate_torque(F_magnitude, F_direction, r):
-    """Calculates and returns torque applied to an object
-    args:
-        F_magnitude (float): magnitude of force applied to object (N)
-        F_direction (float): direction of force applied to object in degrees (degrees)
-        r (float): distance of axis of rotation to point where force is applied in meters
+import math
+
+def calculate_torque(force_magnitude, force_direction, distance):
+    """Calculates and returns torque applied to an object.
+    Args:
+        force_magnitude (float): Magnitude of force applied to object (N).
+        force_direction (float): Direction of force applied to object in degrees.
+        distance (float): Distance of axis of rotation to point where force is applied in meters.
+    Returns:
+        float: Torque applied to the object.
+    Raises:
+        ValueError: If the force magnitude or distance is negative.
     """
-    torque = r * F_magnitude * np.sin(F_direction * 180/np.pi)
+    if force_magnitude < 0 or distance < 0:
+        raise ValueError("Magnitude of the force and distance must be positive.")
+    torque = distance * force_magnitude * math.sin(math.radians(force_direction))
     return torque
 
-def calculate_moment_of_inertia(m, r):
+def calculate_moment_of_inertia(mass, distance):
     """Calculates and returns moment of inertia of a given object.
-    args:
-        m (float): mass of object (kg)
-        r (float): distance from axis of rotation to center of mass of object (m)
+    Args:
+        mass (float): Mass of object (kg).
+        distance (float): Distance from axis of rotation to center of mass of object (m).
+    Returns:
+        float: Moment of inertia of the object.
     """
-    momentOfInertia = m * r**2
-    return momentOfInertia
+    if mass < 0 or distance < 0:
+        raise ValueError("Input must be positive.")
+    moment_of_inertia = mass * (distance**2)
+    return moment_of_inertia
 
-def calculate_auv_acceleration(F_magnitude, F_angle, mass = 100, volume = 0.1, thruster_distance = 0.5):
-    """Calculates acceleration of AUV in 2D plane.
-    args:
-        F_magnitude (float): magnitude of force applied by thruster (N)
-        F_angle (float): angle of force applied by thruster from x-axis (radians)
-        mass (float): mass of AUV - default 100 (kg)
-        volume (float): volume of AUV - default 0.1 (m^3)
-        thruster_distance (float): distance from center of mass of AUV to thruster - default 0.5 (m)
+def calculate_auv_acceleration(force_magnitude, force_angle, mass=100, volume=0.1, thruster_distance=0.5):
+    """Calculates acceleration of AUV in a 2D plane.
+    Args:
+        force_magnitude (float): Magnitude of force applied by thruster (N).
+        force_angle (float): Angle of force applied by thruster from x-axis (radians).
+        mass (float): Mass of AUV (kg), default 100.
+        volume (float): Volume of AUV (m^3), default 0.1.
+        thruster_distance (float): Distance from center of mass of AUV to thruster (m), default 0.5.
+    Returns:
+        float: Net acceleration of the AUV.
     """
-    if F_magnitude > 100 or F_magnitude < 0:
+    if not all(isinstance(val, (int, float)) for val in (force_magnitude, force_angle, mass, volume, thruster_distance)):
+        raise ValueError("Invalid input value(s).")
+    if force_magnitude > 100 or force_magnitude < 0:
         raise ValueError("Value is out of thruster capabilities.")
-    if F_angle > (np.pi/6) or F_angle < (-np.pi/6):
-        raise ValueError("Angle of thruster may not be greater than pi/6 radians in either direction")
-    Ay = F_magnitude * np.sin(F_angle) / mass
-    Ax = F_magnitude * np.cos(F_angle) / mass
-    netAccel = np.sqrt(Ay**2 + Ax**2)
-    return netAccel
-
-def calculate_auv_angular_acceleration(F_magnitude, F_angle, inertia = 1, thruster_distance = 0.5):
-    """Calculates angular acceleration of AUV in 2D plane.
-    args:
-        F_magnitude (float): magnitude of force applied by thruster (N)
-        F_angle (float): angle of force applied by thruster from x-axis (radians)
-        inertia (float): moment of inertia of AUV - default 1 (kg * m^2)
-        thruster_distance (float): distance from center of mass of AUV to thruster - default 0.5 (m)
+    if force_angle > (math.pi / 6) or force_angle < (-math.pi / 6):
+        raise ValueError("Angle of thruster may not be greater than pi/6 radians in either direction.")
+    ay = force_magnitude * math.sin(force_angle) / mass
+    ax = force_magnitude * math.cos(force_angle) / mass
+    net_acceleration = math.sqrt(ay**2 + ax**2)
+    return net_acceleration
+print(calculate_auv_acceleration(10, math.pi / 12, 100, 0.1, 0.5))
+def calculate_auv_angular_acceleration(force_magnitude, force_angle, inertia=1, thruster_distance=0.5):
+    """Calculates angular acceleration of AUV in a 2D plane.
+    Args:
+        force_magnitude (float): Magnitude of force applied by thruster (N).
+        force_angle (float): Angle of force applied by thruster from x-axis (radians).
+        inertia (float): Moment of inertia of AUV (kg * m^2), default 1.
+        thruster_distance (float): Distance from center of mass of AUV to thruster (m), default 0.5.
+    Returns:
+        float: Angular acceleration of the AUV.
     """
-    if F_magnitude > 100 or F_magnitude < 0:
+    if not all(isinstance(val, (int, float)) for val in (force_magnitude, force_angle, inertia, thruster_distance)):
+        raise ValueError("Invalid input value(s).")
+    if force_magnitude > 100 or force_magnitude < 0:
         raise ValueError("Value is out of thruster capabilities.")
-    if F_angle > (np.pi/6) or F_angle < (-np.pi/6):
-        raise ValueError("Angle of thruster may not be greater than pi/6 radians in either direction")
-    Aa = (F_magnitude * np.sin(F_angle) * thruster_distance) / inertia
-    return Aa
+    if force_angle > (math.pi / 6) or force_angle < (-math.pi / 6):
+        raise ValueError("Angle of thruster may not be greater than pi/6 radians in either direction.")
+    angular_acceleration = (force_magnitude * math.sin(force_angle) * thruster_distance) / inertia
+    return angular_acceleration
 
-def calculate_auv2_acceleration(T, alpha, mass = 100):
+def calculate_auv2_acceleration(T, alpha, theta, mass=100):
     """Calculates the acceleration of the AUV in a 2D plane.
-    args:
-        T (float): np.ndarray of magnitudes of forces applied by the thrusters (N)
-        alpha (float): angle of thrusters (radians)
-        mass (float): mass of AUV - defualt 100 (kg)
+    Args:
+        T (np.ndarray): Array of length 4 containing the magnitudes of forces applied by the thrusters (N).
+        alpha (int / float): Angle of thrusters (radians).
+        theta (int / float): Angle of AUV (radians).
+        mass (int / float): Mass of AUV (kg), default 100.
+    Returns:
+        float: Acceleration of the AUV.
     """
-    
+    if len(T) != 4 or not all(isinstance(t, (int, float)) for t in T):
+        raise ValueError("T must be an array-like object of length 4 with numeric values.")
+
+    cos_theta = np.cos(theta)
+    sin_theta = np.sin(theta)
+    cos_alpha = np.cos(alpha)
+    sin_alpha = np.sin(alpha)
+
+    rotation_matrix = np.array([[cos_theta, -sin_theta], [sin_theta, cos_theta]])
+    component_arr = np.array([[cos_alpha, cos_alpha, -cos_alpha, -cos_alpha],
+                              [sin_alpha, -sin_alpha, -sin_alpha, sin_alpha]])
+
+    forces_arr = rotation_matrix @ (component_arr * T)
+    accel_arr = forces_arr / mass
+    auv_accel = np.linalg.norm(accel_arr)
+
+    return auv_accel
+
+
+def calculate_auv2_angular_acceleration(T, alpha, L, l, inertia=100):
+    """Calculates and returns angular acceleration of the AUV.
+    Args:
+        T (np.ndarray): Array of length 4 containing the magnitudes of forces applied by thrusters (N).
+        alpha (int / float): Angle of thrusters in radians.
+        L (int / float): Distance from center of mass (m).
+        l (int / float): Distance from center of mass (m).
+        inertia (int / float): Moment of inertia of AUV (kg * m^2).
+    Returns:
+        float: Angular acceleration of the AUV.
+    """
+    if len(T) != 4 or not all(isinstance(t, (int, float)) for t in T):
+        raise ValueError("T must be an array-like object of length 4 with numeric values.")
+
+    sin_alpha = np.sin(alpha)
+    cos_alpha = np.cos(alpha)
+
+    torque = (L * sin_alpha + l * cos_alpha) * (T[0] - T[1] + T[2] - T[3])
+    angle_accel = torque / inertia
+
+    return angle_accel
 
 
 if __name__ == "__main__":
     # Trial
-    print(calculate_buoyancy(1, water_density))
-    print(will_it_float(1, 999))
-    print(calculate_pressure(100))
+    pass

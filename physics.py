@@ -158,8 +158,8 @@ def calculate_auv2_acceleration(T, alpha, theta, mass=100):
     Returns:
         float: Acceleration of the AUV.
     """
-    if len(T) != 4 or not all(isinstance(t, (int, float)) for t in T):
-        raise ValueError("T must be an array-like object of length 4 with numeric values.")
+    if T.shape != (4, 1) or not isinstance(T, np.ndarray):
+        raise ValueError("T must be an array of shape 4 x 1.")
 
     cos_theta = np.cos(theta)
     sin_theta = np.sin(theta)
@@ -170,12 +170,13 @@ def calculate_auv2_acceleration(T, alpha, theta, mass=100):
     component_arr = np.array([[cos_alpha, cos_alpha, -cos_alpha, -cos_alpha],
                               [sin_alpha, -sin_alpha, -sin_alpha, sin_alpha]])
 
-    forces_arr = rotation_matrix @ (component_arr * T)
+    forcesprime_arr = np.matmul(component_arr, T)
+    forces_arr = np.matmul(rotation_matrix, forcesprime_arr)
     accel_arr = forces_arr / mass
-    auv_accel = np.linalg.norm(accel_arr)
+    return accel_arr
 
-    return auv_accel
-
+print(calculate_auv2_acceleration(np.array([[2], [2], [0], [0]]), 0.5, 0.5, 0.5))
+print(type(calculate_auv2_acceleration(np.array([[2], [2], [0], [0]]), 0.5, 0.5, 0.5)))
 
 def calculate_auv2_angular_acceleration(T, alpha, L, l, inertia=100):
     """Calculates and returns angular acceleration of the AUV.
@@ -188,17 +189,16 @@ def calculate_auv2_angular_acceleration(T, alpha, L, l, inertia=100):
     Returns:
         float: Angular acceleration of the AUV.
     """
-    if len(T) != 4 or not all(isinstance(t, (int, float)) for t in T):
-        raise ValueError("T must be an array-like object of length 4 with numeric values.")
+    if T.shape != (4, 1) or not isinstance(T, np.ndarray):
+        raise ValueError("T must be an array of shape 4 x 1")
 
     sin_alpha = np.sin(alpha)
     cos_alpha = np.cos(alpha)
 
-    torque = (L * sin_alpha + l * cos_alpha) * (T[0] - T[1] + T[2] - T[3])
+    torque = (L * sin_alpha + l * cos_alpha) * (T[0][0] - T[1][0] + T[2][0] - T[3][0])
     angle_accel = torque / inertia
 
     return angle_accel
-
 
 if __name__ == "__main__":
     # Trial

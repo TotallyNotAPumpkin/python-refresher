@@ -1,5 +1,4 @@
 import unittest
-import math
 import numpy as np
 import physics
 
@@ -47,35 +46,36 @@ class TestPhysics(unittest.TestCase):
         self.assertRaises(ValueError, physics.calculate_moment_of_inertia, 10, -2)
     
     def test_calculate_auv_acceleration(self):
-        self.assertAlmostEqual(physics.calculate_auv_acceleration(10, math.pi / 12, 100, 0.1, 0.5), 0.099999999999)
+        self.assertAlmostEqual(physics.calculate_auv_acceleration(10, np.pi / 12, 100, 0.1, 0.5), 0.099999999999)
         # Force magnitude exceeds thruster capabilities
-        self.assertRaises(ValueError, physics.calculate_auv_acceleration, 110, math.pi / 4, 100, 0.1, 0.5)
+        self.assertRaises(ValueError, physics.calculate_auv_acceleration, 110, np.pi / 4, 100, 0.1, 0.5)
         # Negative force magnitude
-        self.assertRaises(ValueError, physics.calculate_auv_acceleration, -10, math.pi / 4, 100, 0.1, 0.5)
+        self.assertRaises(ValueError, physics.calculate_auv_acceleration, -10, np.pi / 4, 100, 0.1, 0.5)
         # Angle of thruster exceeds the limit (pi/6 radians)
-        self.assertRaises(ValueError, physics.calculate_auv_acceleration, 10, math.pi / 3, 100, 0.1, 0.5)
+        self.assertRaises(ValueError, physics.calculate_auv_acceleration, 10, np.pi / 3, 100, 0.1, 0.5)
         # Negative mass
-        self.assertRaises(ValueError, physics.calculate_auv_acceleration, 10, math.pi / 4, -100, 0.1, 0.5)
+        self.assertRaises(ValueError, physics.calculate_auv_acceleration, 10, np.pi / 4, -100, 0.1, 0.5)
         # Negative volume
-        self.assertRaises(ValueError, physics.calculate_auv_acceleration, 10, math.pi / 4, 100, -0.1, 0.5)
+        self.assertRaises(ValueError, physics.calculate_auv_acceleration, 10, np.pi / 4, 100, -0.1, 0.5)
         # Negative thruster distance
-        self.assertRaises(ValueError, physics.calculate_auv_acceleration, 10, math.pi / 4, 100, 0.1, -0.5)
+        self.assertRaises(ValueError, physics.calculate_auv_acceleration, 10, np.pi / 4, 100, 0.1, -0.5)
 
     def test_calculate_auv_angular_acceleration(self):
-        self.assertAlmostEqual(physics.calculate_auv_angular_acceleration(10, math.pi/4, 1, 0.5), 14.1421356237)
-        self.assertNotEqual(physics.calculate_auv_angular_acceleration(10, math.pi/4, 1, 0.5), 20)
-        self.assertRaises(ValueError, physics.calculate_auv_angular_acceleration, -10, math.pi/4, 1, 0.5)
+        self.assertAlmostEqual(physics.calculate_auv_angular_acceleration(10, np.pi/4, 1, 0.5), 14.1421356237)
+        self.assertNotEqual(physics.calculate_auv_angular_acceleration(10, np.pi/4, 1, 0.5), 20)
+        self.assertRaises(ValueError, physics.calculate_auv_angular_acceleration, -10, np.pi/4, 1, 0.5)
     
     def test_calculate_auv2_acceleration(self):
         self.assertTrue(np.all(np.isclose(physics.calculate_auv2_acceleration(np.array([[2], [2], [0], [0]]), 0.5, 0.5, 0.5), np.array([[6.16120922], [3.36588394]]))))
         self.assertFalse(np.all(np.isclose(physics.calculate_auv2_acceleration(np.array([[2], [0], [2], [0]]), 0.5, 0.5, 0.5), np.array([[6.16120922], [3.36588394]]))))
-        self.assertRaises(ValueError, physics.calculate_auv2_acceleration, [0, 2, 0, 2], 0.5, 0.5, -0.5)
-    
+        self.assertRaises(TypeError, physics.calculate_auv2_acceleration, [0, 2, 0, 2], 0.5, 0.5, 0.5)
+        self.assertRaises(ValueError, physics.calculate_auv2_acceleration, np.ndarray([[2], [0], [2], [0]]), 0.5, 0.5, -0.5)
+
     def test_calculate_auv2_angular_acceleration(self):
         self.assertAlmostEqual(physics.calculate_auv2_angular_acceleration(np.array([[2], [2], [0], [0]]), 0.5, 2, 2, 100), 0.0)
         self.assertAlmostEqual(physics.calculate_auv2_angular_acceleration(np.array([[2], [1], [0], [0]]), 0.5, 2, 2, 100), 0.027140162009891514)
         self.assertNotEqual(physics.calculate_auv2_angular_acceleration(np.array([[2], [4], [0], [0]]), 0.5, 2, 2, 100), 0.027140162009891514)
-        self.assertRaises(ValueError, physics.calculate_auv2_angular_acceleration, [0, 2, 0, 2], 0.5, 2, 2, -100)
+        self.assertRaises(TypeError, physics.calculate_auv2_angular_acceleration, [0, 2, 0, 2], 0.5, 2, 2, 100)
     
 if __name__ == "__main__":
     unittest.main()

@@ -1,5 +1,5 @@
 import numpy as np
-import math
+import matplotlib.pyplot as plt 
 
 g = 9.81 # m/s^2
 atm_pressure = 101325 # Pa
@@ -37,9 +37,9 @@ def will_it_float(V, mass):
 def calculate_pressure(depth):
     """Compute and returns the pressure exerted on an object at a specified depth. 
     Args: 
-        depth (float): depth of object in water (m)
+        depth (int / float): depth of object in water (m)
     Returns:
-        pressure (float): the pressure exerted on the object by the fluid (Pa)
+        pressure (int / float): the pressure exerted on the object by the fluid (Pa)
     """
     if depth < 0:
         raise ValueError("Input must be positive.")
@@ -49,8 +49,8 @@ def calculate_pressure(depth):
 def calculate_acceleration(force, mass):
     """Calculates and returns acceleration of an object.
     Args:
-        force (float): Force applied to object in Newtons.
-        mass (float): Mass of object in kg.
+        force (int / float): Force applied to object in Newtons.
+        mass (int / float): Mass of object in kg.
     Returns:
         float: Acceleration of object with the given force and mass.
     """
@@ -64,8 +64,8 @@ def calculate_acceleration(force, mass):
 def calculate_angular_acceleration(torque, moment_of_inertia):
     """Calculates angular acceleration of an object.
     Args:
-        torque (float): Torque applied to object in Nm.
-        moment_of_inertia (float): Moment of inertia of object in kg * m^2.
+        torque (int / float): Torque applied to object in Nm.
+        moment_of_inertia (int / float): Moment of inertia of object in kg * m^2.
     Returns:
         float: Angular acceleration of the object.
     """
@@ -76,14 +76,12 @@ def calculate_angular_acceleration(torque, moment_of_inertia):
     angular_acceleration = torque / moment_of_inertia
     return angular_acceleration
 
-import math
-
 def calculate_torque(force_magnitude, force_direction, distance):
     """Calculates and returns torque applied to an object.
     Args:
-        force_magnitude (float): Magnitude of force applied to object (N).
-        force_direction (float): Direction of force applied to object in degrees.
-        distance (float): Distance of axis of rotation to point where force is applied in meters.
+        force_magnitude (int / float): Magnitude of force applied to object (N).
+        force_direction (int / float): Direction of force applied to object in degrees.
+        distance (int / float): Distance of axis of rotation to point where force is applied in meters.
     Returns:
         float: Torque applied to the object.
     Raises:
@@ -91,14 +89,14 @@ def calculate_torque(force_magnitude, force_direction, distance):
     """
     if force_magnitude < 0 or distance < 0:
         raise ValueError("Magnitude of the force and distance must be positive.")
-    torque = distance * force_magnitude * math.sin(math.radians(force_direction))
+    torque = distance * force_magnitude * np.sin(np.deg2rad(force_direction))
     return torque
 
 def calculate_moment_of_inertia(mass, distance):
     """Calculates and returns moment of inertia of a given object.
     Args:
-        mass (float): Mass of object (kg).
-        distance (float): Distance from axis of rotation to center of mass of object (m).
+        mass (int / float): Mass of object (kg).
+        distance (int / float): Distance from axis of rotation to center of mass of object (m).
     Returns:
         float: Moment of inertia of the object.
     """
@@ -110,11 +108,11 @@ def calculate_moment_of_inertia(mass, distance):
 def calculate_auv_acceleration(force_magnitude, force_angle, mass=100, volume=0.1, thruster_distance=0.5):
     """Calculates acceleration of AUV in a 2D plane.
     Args:
-        force_magnitude (float): Magnitude of force applied by thruster (N).
-        force_angle (float): Angle of force applied by thruster from x-axis (radians).
-        mass (float): Mass of AUV (kg), default 100.
-        volume (float): Volume of AUV (m^3), default 0.1.
-        thruster_distance (float): Distance from center of mass of AUV to thruster (m), default 0.5.
+        force_magnitude (int / float): Magnitude of force applied by thruster (N).
+        force_angle (int / float): Angle of force applied by thruster from x-axis (radians).
+        mass (int / float): Mass of AUV (kg), default 100.
+        volume (int / float): Volume of AUV (m^3), default 0.1.
+        thruster_distance (int / float): Distance from center of mass of AUV to thruster (m), default 0.5.
     Returns:
         float: Net acceleration of the AUV.
     """
@@ -122,30 +120,30 @@ def calculate_auv_acceleration(force_magnitude, force_angle, mass=100, volume=0.
         raise ValueError("Invalid input value(s).")
     if force_magnitude > 100 or force_magnitude < 0:
         raise ValueError("Value is out of thruster capabilities.")
-    if force_angle > (math.pi / 6) or force_angle < (-math.pi / 6):
+    if force_angle > (np.pi / 6) or force_angle < (-np.pi / 6):
         raise ValueError("Angle of thruster may not be greater than pi/6 radians in either direction.")
-    ay = force_magnitude * math.sin(force_angle) / mass
-    ax = force_magnitude * math.cos(force_angle) / mass
-    net_acceleration = math.sqrt(ay**2 + ax**2)
+    ay = force_magnitude * np.sin(force_angle) / mass
+    ax = force_magnitude * np.cos(force_angle) / mass
+    net_acceleration = np.sqrt(ay**2 + ax**2)
     return net_acceleration
 
 def calculate_auv_angular_acceleration(force_magnitude, force_angle, inertia=1, thruster_distance=0.5):
     """Calculates angular acceleration of AUV in a 2D plane.
     Args:
-        force_magnitude (float): Magnitude of force applied by thruster (N).
-        force_angle (float): Angle of force applied by thruster from x-axis (radians).
-        inertia (float): Moment of inertia of AUV (kg * m^2), default 1.
-        thruster_distance (float): Distance from center of mass of AUV to thruster (m), default 0.5.
+        force_magnitude (int / float): Magnitude of force applied by thruster (N).
+        force_angle (int / float): Angle of force applied by thruster from x-axis (radians).
+        inertia (int / float): Moment of inertia of AUV (kg * m^2), default 1.
+        thruster_distance (int / float): Distance from center of mass of AUV to thruster (m), default 0.5.
     Returns:
         float: Angular acceleration of the AUV.
     """
     if not all(isinstance(val, (int, float)) for val in (force_magnitude, force_angle, inertia, thruster_distance)):
-        raise ValueError("Invalid input value(s).")
+        raise ValueError("Input value(s) must be either float or int.")
     if force_magnitude > 100 or force_magnitude < 0:
         raise ValueError("Value is out of thruster capabilities.")
-    if force_angle > (math.pi / 6) or force_angle < (-math.pi / 6):
+    if force_angle > (np.pi / 6) or force_angle < (-np.pi / 6):
         raise ValueError("Angle of thruster may not be greater than pi/6 radians in either direction.")
-    angular_acceleration = (force_magnitude * math.sin(force_angle) * thruster_distance) / inertia
+    angular_acceleration = (force_magnitude * np.sin(force_angle) * thruster_distance) / inertia
     return angular_acceleration
 
 def calculate_auv2_acceleration(T, alpha, theta, mass=100):
@@ -158,9 +156,10 @@ def calculate_auv2_acceleration(T, alpha, theta, mass=100):
     Returns:
         float: Acceleration of the AUV.
     """
-    if T.shape != (4, 1) or not isinstance(T, np.ndarray):
-        raise ValueError("T must be an array of shape 4 x 1.")
-
+    if not isinstance(T, np.ndarray):
+        raise TypeError("Forces array must be an array.")
+    if T.shape != (4, 1):
+        raise ValueError("Forces array must be an array of shape 4 x 1.")
     cos_theta = np.cos(theta)
     sin_theta = np.sin(theta)
     cos_alpha = np.cos(alpha)
@@ -175,9 +174,6 @@ def calculate_auv2_acceleration(T, alpha, theta, mass=100):
     accel_arr = forces_arr / mass
     return accel_arr
 
-print(calculate_auv2_acceleration(np.array([[2], [2], [0], [0]]), 0.5, 0.5, 0.5))
-print(type(calculate_auv2_acceleration(np.array([[2], [2], [0], [0]]), 0.5, 0.5, 0.5)))
-
 def calculate_auv2_angular_acceleration(T, alpha, L, l, inertia=100):
     """Calculates and returns angular acceleration of the AUV.
     Args:
@@ -189,8 +185,10 @@ def calculate_auv2_angular_acceleration(T, alpha, L, l, inertia=100):
     Returns:
         float: Angular acceleration of the AUV.
     """
-    if T.shape != (4, 1) or not isinstance(T, np.ndarray):
-        raise ValueError("T must be an array of shape 4 x 1")
+    if not isinstance(T, np.ndarray):
+        raise TypeError("Forces array must be an array.")
+    if T.shape != (4, 1):
+        raise ValueError("Forces array must be shape 4 x 1")
 
     sin_alpha = np.sin(alpha)
     cos_alpha = np.cos(alpha)
@@ -200,6 +198,49 @@ def calculate_auv2_angular_acceleration(T, alpha, L, l, inertia=100):
 
     return angle_accel
 
+def simulate_auv2_motion(T, alpha, L, l, mass = 100, inertia = 1000, dt = 0.1, t_final = 10, x0 = 0, y0 = 0, theta0 = 0):
+    state = np.array([[x0], [y0], [theta0]]) # x, y, heading
+    t = np.arange(0, (t_final), dt)
+    position = np.tile(np.zeros_like(t), (2, 1))
+    theta = np.zeros_like(t)
+    v = np.tile(np.zeros_like(t), (2, 1))
+    omega = np.zeros_like(t)
+    angular_acceleration = np.zeros_like(t)
+    a = np.tile(np.zeros_like(t), (2, 1))
+
+    for i in range(1, len(t)):
+        angular_acceleration[i] = calculate_auv2_angular_acceleration(T, alpha, L, l, inertia)
+        omega[i] = angular_acceleration[i-1] * dt + omega[i-1]
+        theta[i] = omega[i-1] * dt + theta[i-1]
+        a[0][i] = calculate_auv2_acceleration(T, alpha, state[2][0], mass)[0][0]
+        a[1][i] = calculate_auv2_acceleration(T, alpha, state[2][0], mass)[1][0]
+        v[0][i] = a[0][i-1] * dt + v[0][i-1]
+        v[1][i] = a[1][i-1] * dt + v[1][i-1]
+        position[0][i] = v[0][i-1] * dt + position[0][i]
+        position[1][i] = v[1][i-1] * dt + position[1][i]
+    x = position[0]
+    y = position[1]
+
+    auvDict = {
+        "Time" : t,
+        "XPosition" : x,
+        "Yposition" : y,
+        "theta:" : theta,
+        "velocity" : v,
+        "angularVelocity" : omega,
+        "acceleration" : a
+    }
+
+    return auvDict
+
+def plot_auv2_motion(t, x, y, theta, v, omega, a):
+
+    plt.plot(x, y)
+    plt.xlabel("X-position")
+    plt.ylabel("Y-position")
+    plt.legend()
+    plt.show()
+
 if __name__ == "__main__":
     # Trial
-    pass
+        simulate_auv2_motion(np.array([[0], [0], [2], [0]]), 1, 1, 1)

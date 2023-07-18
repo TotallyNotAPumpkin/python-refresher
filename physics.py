@@ -174,6 +174,8 @@ def calculate_auv2_acceleration(T, alpha, theta, mass=100):
     accel_arr = forces_arr / mass
     return accel_arr
 
+print(calculate_auv2_acceleration(np.array([[0], [50], [50], [0]]), np.pi/4, 0, 100))
+
 def calculate_auv2_angular_acceleration(T, alpha, L, l, inertia=100):
     """Calculates and returns angular acceleration of the AUV.
     Args:

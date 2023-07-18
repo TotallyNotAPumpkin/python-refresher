@@ -247,8 +247,8 @@ def simulate_auv2_motion(
         )
         omega[i] = angular_acceleration[i - 1] * dt + omega[i - 1]
         theta[i] = omega[i - 1] * dt + theta[i - 1]
-        a[0][i] = calculate_auv2_acceleration(T, alpha, state[2][0], mass)[0][0]
-        a[1][i] = calculate_auv2_acceleration(T, alpha, state[2][0], mass)[1][0]
+        a[0][i] = calculate_auv2_acceleration(T, alpha, theta[i - 1], mass)[0][0]
+        a[1][i] = calculate_auv2_acceleration(T, alpha, theta[i - 1], mass)[1][0]
         v[0, i] = a[0][i - 1] * dt + v[0][i - 1]
         v[1, i] = a[1][i - 1] * dt + v[1][i - 1]
         position[0][i] = v[0][i - 1] * dt + position[0][i]
@@ -259,7 +259,7 @@ def simulate_auv2_motion(
     auvDict = {
         "Time": t,
         "XPosition": x,
-        "Yposition": y,
+        "YPosition": y,
         "theta:": theta,
         "velocity": v,
         "angularVelocity": omega,
@@ -267,14 +267,6 @@ def simulate_auv2_motion(
     }
 
     return auvDict
-
-
-def plot_auv2_motion(t, x, y, theta, v, omega, a):
-    plt.plot(x, y)
-    plt.xlabel("X-position")
-    plt.ylabel("Y-position")
-    plt.legend()
-    plt.show()
 
 
 if __name__ == "__main__":

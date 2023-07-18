@@ -232,7 +232,20 @@ def calculate_auv2_angular_acceleration(T, alpha, L, l, inertia=100):
 def simulate_auv2_motion(
     T, alpha, L, l, mass=100, inertia=1000, dt=0.1, t_final=10, x0=0, y0=0, theta0=0
 ):
-    state = np.array([[x0], [y0], [theta0]])  # x, y, heading
+    """Returns a dictionary with simulatd AUV motion
+    args:
+        T (np.ndarray): 4 x 1 array of magnitudes of the forces applied by the thrusters (N)
+        alpha (int / float): the angle of thrusters (radians)
+        L (int / alpha): distance from center of mass of AUV to thrusters (m)
+        l (int / alpha): distance from center of mass of AUV to thrusters (m)
+        inertia (int / alpha): moment of inertia of AUV - default 100 (kg * m^2)
+        dt (int / alpha): time step of simulation in seconds - default 0.1 (s)
+        t_final (int / alpha): final time of simulation in seconds - default 10 (s)
+        x0 (int / float): initial x-position - default 0 (m)
+        y0 (int / float): inital y-position - default 0 (m)
+        theta0 (int / float): initial angle -default 0 (radians)
+    """
+    # initializing arrays
     t = np.arange(0, (t_final), dt)
     position = np.tile(np.zeros_like(t), (2, 1))
     theta = np.zeros_like(t)
@@ -241,18 +254,24 @@ def simulate_auv2_motion(
     angular_acceleration = np.zeros_like(t)
     a = np.tile(np.zeros_like(t), (2, 1))
 
+    # setting AUV position and heading at time = 0
+    position[0][0] = x0
+    position[1][0] = y0
+    theta[0] = theta0
+
+    # loop that updates arrays
     for i in range(1, len(t)):
         angular_acceleration[i] = calculate_auv2_angular_acceleration(
             T, alpha, L, l, inertia
         )
         omega[i] = angular_acceleration[i - 1] * dt + omega[i - 1]
         theta[i] = omega[i - 1] * dt + theta[i - 1]
-        a[0][i] = calculate_auv2_acceleration(T, alpha, theta[i - 1], mass)[0][0]
-        a[1][i] = calculate_auv2_acceleration(T, alpha, theta[i - 1], mass)[1][0]
+        a[0][i] = calculate_auv2_acceleration(T, alpha, theta[i], mass)[0][0]
+        a[1][i] = calculate_auv2_acceleration(T, alpha, theta[i], mass)[1][0]
         v[0, i] = a[0][i - 1] * dt + v[0][i - 1]
         v[1, i] = a[1][i - 1] * dt + v[1][i - 1]
-        position[0][i] = v[0][i - 1] * dt + position[0][i]
-        position[1][i] = v[1][i - 1] * dt + position[1][i]
+        position[0][i] = v[0][i - 1] * dt + position[0][i - 1]
+        position[1][i] = v[1][i - 1] * dt + position[1][i - 1]
     x = position[0]
     y = position[1]
 
